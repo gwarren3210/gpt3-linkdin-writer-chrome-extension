@@ -39,7 +39,7 @@ const generate = async (prompt) => {
       body: JSON.stringify({
         model: 'text-davinci-003',
         prompt: prompt,
-        max_tokens: 1250,
+        max_tokens: 250,
         temperature: 0.7,
       }),
     });
@@ -56,20 +56,21 @@ const generateCompletionAction = async (info) => {
       const { selectionText } = info;
       const basePromptPrefix = 
       `
-         Write me a detailed table of contents for a blog post with the title below.
-         Title:
+      Generate 1 linkdin title from the idea below.
+
+      Idea:
       `;
 
      const baseCompletion = await generate(`${basePromptPrefix}${selectionText}`);
      
      const secondPrompt = `
-     Take the table of contents and title of the blog post below and generate a blog post written in thwe style of Paul Graham. Make it feel like a story. Don't just list the points. Go deep into each one. Explain why.
+     Take the idea and titles and generate write a concise inspirational linkdin post in the style of Neil Patel and Gary Vaynerchuk. Make sure to include a personal anecdote and lessons learned from said story that relates to the title. The post should convey confidence and authenticity. Include trending hashtags in a new line at the end related to the content in the post.
+
+     Idea: ${selectionText}
      
-     Title: ${selectionText}
+     Titles: ${baseCompletion.text}
      
-     Table of Contents: ${baseCompletion.text}
-     
-     Blog Post:
+     LinkdIn Post:
      `;
 
      const secondPromptCompletion = await generate(secondPrompt);
