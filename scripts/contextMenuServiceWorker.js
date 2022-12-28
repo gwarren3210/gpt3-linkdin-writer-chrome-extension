@@ -11,20 +11,20 @@ const getKey = () => {
 };
 
 const sendMessage = (content) => {
+   console.log(content)
    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-     const activeTab = tabs[0].id;
- 
-     chrome.tabs.sendMessage(
-       activeTab,
-       { message: 'inject', content },
-       (response) => {
-         if (response.status === 'failed') {
-           console.log('injection failed.');
+      const activeTab = tabs[0].id;
+      chrome.tabs.sendMessage(
+         activeTab,
+         { message: 'inject', content },
+         (response) => {
+            if (response.status === 'failed') {
+               console.log('injection failed.');
+            }
          }
-       }
-     );
+      );
    });
- };
+};
 
 const generate = async (prompt) => {
    const key = await getKey();
@@ -52,7 +52,6 @@ const generate = async (prompt) => {
 const generateCompletionAction = async (info) => {
    try {
       sendMessage('generating...');
-      console.log('generating...');
 
       const { selectionText } = info;
       const basePromptPrefix = 
@@ -62,7 +61,6 @@ const generateCompletionAction = async (info) => {
       `;
 
      const baseCompletion = await generate(`${basePromptPrefix}${selectionText}`);
-     console.log(baseCompletion);
      
      const secondPrompt = `
      Take the table of contents and title of the blog post below and generate a blog post written in thwe style of Paul Graham. Make it feel like a story. Don't just list the points. Go deep into each one. Explain why.
