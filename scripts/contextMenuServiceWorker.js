@@ -11,7 +11,7 @@ const getKey = () => {
 };
 
 const sendMessage = (content) => {
-   console.log(content)
+   //console.log(content)
    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const activeTab = tabs[0].id;
       chrome.tabs.sendMessage(
@@ -26,7 +26,7 @@ const sendMessage = (content) => {
    });
 };
 
-const generate = async (prompt) => {
+const generate = async (prompt, tokens = 250) => {
    const key = await getKey();
    const url = 'https://api.openai.com/v1/completions';
 
@@ -39,7 +39,7 @@ const generate = async (prompt) => {
       body: JSON.stringify({
         model: 'text-davinci-003',
         prompt: prompt,
-        max_tokens: 150,
+        max_tokens: tokens,
         temperature: 0.7,
       }),
     });
@@ -61,10 +61,10 @@ const generateCompletionAction = async (info) => {
       Idea:
       `;
 
-     const baseCompletion = await generate(`${basePromptPrefix}${selectionText}`);
+     const baseCompletion = await generate(`${basePromptPrefix}${selectionText}`, 100);
      
      const secondPrompt = `
-     Take the idea and titles and generate write a concise inspirational linkdin post in the style of Neil Patel and Gary Vaynerchuk. Make sure to include a personal anecdote and lessons learned from said story that relates to the title. The post should convey confidence and authenticity. Include trending hashtags in a new line at the end related to the content in the post.
+     Take the idea and titles and generate a concise inspirational linkdin post in the style of Neil Patel and Gary Vaynerchuk. Make sure to include a personal anecdote and lessons learned from said story that relates to the title. The post should convey confidence and authenticity.
 
      Idea: ${selectionText}
      
@@ -73,8 +73,21 @@ const generateCompletionAction = async (info) => {
      LinkdIn Post:
      `;
 
-     const secondPromptCompletion = await generate(secondPrompt);
-     sendMessage(secondPromptCompletion.text);
+     const secondPromptCompletion = await generate(secondPrompt, 200);
+     const thirdPrompt = `
+     Take the LinkdIn post below and generate 5 unordered trending hashtags related to the content in the post.
+
+     LinkdIn post: ${secondPromptCompletion.text}
+     
+     Hashtags:
+     `;
+
+     const thirdPromptCompletion = await generate(thirdPrompt, 100);
+     const completedPrompt = `${secondPromptCompletion.text}
+     
+     ${thirdPromptCompletion.text}`
+     console.log(thirdPromptCompletion.text)
+     sendMessage(completedPrompt);
     } catch (error) {
       console.log(error);
       sendMessage(error.toString());
