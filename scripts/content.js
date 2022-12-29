@@ -1,5 +1,5 @@
 const insert = content => {
-   const elements = document.getElementsByClassName('droid');
+   const elements = document.getElementsByClassName('ql-editor');
 
    if (elements.length === 0) {
       return;
